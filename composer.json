@@ -1,0 +1,8 @@
+{
+    "name": "limbab3/tracking",
+    "description": "Sistem Tracking Limbah B3",
+    "require": {
+        "tecnickcom/tcpdf": "^6.6",
+        "phpoffice/phpspreadsheet": "^1.29"
+    }
+}
