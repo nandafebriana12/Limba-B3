@@ -21,14 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sampah_ids = $_POST['sampah_id'] ?? [];
         $quantities = $_POST['quantity'] ?? [];
 
-        // Konversi datetime-local (YYYY-MM-DDTHH:MM) ke format SQL Server.
+        // Konversi datetime-local ke format SQL Server.
         if (!empty($tanggal_masuk)) {
-            $tanggalObj = DateTime::createFromFormat('Y-m-d\\TH:i', $tanggal_masuk);
-
-            if (!$tanggalObj || $tanggalObj->format('Y-m-d\\TH:i') !== $tanggal_masuk) {
-                $error = "Format tanggal masuk tidak valid.";
-            } else {
+            try {
+                $tanggalObj = new DateTime($tanggal_masuk);
                 $tanggal_masuk = $tanggalObj->format('Y-m-d H:i:s');
+            } catch (Exception $e) {
+                $error = "Format tanggal masuk tidak valid.";
             }
         }
         

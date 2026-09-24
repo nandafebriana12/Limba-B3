@@ -53,6 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $tanggal_keluar = $_POST['tanggal_keluar'] ?? '';
         $keterangan = sanitize($_POST['keterangan'] ?? '');
 
+        if (!empty($tanggal_keluar)) {
+            try {
+                $tanggalObj = new DateTime($tanggal_keluar);
+                $tanggal_keluar = $tanggalObj->format('Y-m-d H:i:s');
+            } catch (Exception $e) {
+                $error = "Format tanggal keluar tidak valid.";
+            }
+        }
+
         $limbah_ids = $_POST['limbah_id'] ?? [];
         $qty = $_POST['quantity'] ?? [];
 
