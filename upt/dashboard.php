@@ -45,4 +45,116 @@ try {
     <p>Di sini Anda dapat menginput data limbah B3 yang akan disalurkan, serta melihat riwayat data masuk dan keluar yang terkait dengan UPT Anda.</p>
 </div>
 
+
+
+<?php
+// Mengambil data untuk grafik (Jumlah transaksi masuk untuk UPT ini & keluar global per bulan)
+$monthly_data = [];
+
+try {
+    // Data Masuk (khusus user ini)
+    $stmtChart = $conn->prepare("
+        SELECT 
+            CONVERT(varchar(7), tanggal_masuk, 126) as bulan, 
+            COUNT(id) as total
+        FROM transaksi_masuk
+        WHERE user_id = ?
+        GROUP BY CONVERT(varchar(7), tanggal_masuk, 126)
+    ");
+    $stmtChart->execute([$user_id]);
+    while ($row = $stmtChart->fetch()) {
+        $bulan = $row['bulan'];
+        if (!isset($monthly_data[$bulan])) {
+            $monthly_data[$bulan] = ['masuk' => 0, 'keluar' => 0];
+        }
+        $monthly_data[$bulan]['masuk'] = $row['total'];
+    }
+
+    // Data Keluar (global ke vendor)
+    $stmtKeluar = $conn->query("
+        SELECT 
+            CONVERT(varchar(7), tanggal_keluar, 126) as bulan, 
+            COUNT(id) as total
+        FROM transaksi_keluar
+        GROUP BY CONVERT(varchar(7), tanggal_keluar, 126)
+    ");
+    while ($row = $stmtKeluar->fetch()) {
+        $bulan = $row['bulan'];
+        if (!isset($monthly_data[$bulan])) {
+            $monthly_data[$bulan] = ['masuk' => 0, 'keluar' => 0];
+        }
+        $monthly_data[$bulan]['keluar'] = $row['total'];
+    }
+} catch(PDOException $e) {
+    // Ignore error
+}
+
+ksort($monthly_data);
+
+$chart_labels = array_keys($monthly_data);
+$data_masuk = [];
+$data_keluar = [];
+
+foreach($monthly_data as $data) {
+    $data_masuk[] = $data['masuk'];
+    $data_keluar[] = $data['keluar'];
+}
+?>
+
+<div class="card" style="margin-top: 20px;">
+    <div class="card-header">
+        <h3 class="card-title">Grafik Transaksi Masuk (Saya) & Keluar (Ke Vendor) per Bulan</h3>
+    </div>
+    <div style="width: 100%; max-height: 400px; display: flex; justify-content: center;">
+        <canvas id="transaksiChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('transaksiChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($chart_labels) ?>,
+            datasets: [
+                {
+                    label: 'Limbah Masuk (UPT Saya)',
+                    data: <?= json_encode($data_masuk) ?>,
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+                },
+                {
+                    label: 'Limbah Keluar (Total ke Vendor)',
+                    data: <?= json_encode($data_keluar) ?>,
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: 'rgba(239, 68, 68, 1)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

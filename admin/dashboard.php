@@ -66,4 +66,109 @@ try {
     </div>
 </div>
 
+<?php
+// Mengambil data untuk grafik (Jumlah transaksi masuk & keluar per bulan)
+$monthly_data = [];
+
+try {
+    // Data Masuk
+    $stmtMasuk = $conn->query("
+        SELECT 
+            CONVERT(varchar(7), tanggal_masuk, 126) as bulan, 
+            COUNT(id) as total
+        FROM transaksi_masuk
+        GROUP BY CONVERT(varchar(7), tanggal_masuk, 126)
+    ");
+    while ($row = $stmtMasuk->fetch()) {
+        $bulan = $row['bulan'];
+        if (!isset($monthly_data[$bulan])) {
+            $monthly_data[$bulan] = ['masuk' => 0, 'keluar' => 0];
+        }
+        $monthly_data[$bulan]['masuk'] = $row['total'];
+    }
+
+    // Data Keluar
+    $stmtKeluar = $conn->query("
+        SELECT 
+            CONVERT(varchar(7), tanggal_keluar, 126) as bulan, 
+            COUNT(id) as total
+        FROM transaksi_keluar
+        GROUP BY CONVERT(varchar(7), tanggal_keluar, 126)
+    ");
+    while ($row = $stmtKeluar->fetch()) {
+        $bulan = $row['bulan'];
+        if (!isset($monthly_data[$bulan])) {
+            $monthly_data[$bulan] = ['masuk' => 0, 'keluar' => 0];
+        }
+        $monthly_data[$bulan]['keluar'] = $row['total'];
+    }
+} catch(PDOException $e) {
+    // Ignore error jika tabel kosong
+}
+
+// Urutkan berdasarkan bulan (kunci array)
+ksort($monthly_data);
+
+$chart_labels = array_keys($monthly_data);
+$data_masuk = [];
+$data_keluar = [];
+
+foreach($monthly_data as $data) {
+    $data_masuk[] = $data['masuk'];
+    $data_keluar[] = $data['keluar'];
+}
+?>
+
+<div class="card" style="margin-top: 20px;">
+    <div class="card-header">
+        <h3 class="card-title">Grafik Transaksi Masuk & Keluar per Bulan</h3>
+    </div>
+    <div style="width: 100%; max-height: 400px; display: flex; justify-content: center;">
+        <canvas id="transaksiChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('transaksiChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($chart_labels) ?>,
+            datasets: [
+                {
+                    label: 'Limbah Masuk (Dari UPT)',
+                    data: <?= json_encode($data_masuk) ?>,
+                    backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Limbah Keluar (Ke Vendor)',
+                    data: <?= json_encode($data_keluar) ?>,
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
