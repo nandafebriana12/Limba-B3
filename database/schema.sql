@@ -18,6 +18,7 @@ CREATE TABLE upts (
     nama_upt VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT GETDATE()
 );
+GO
 
 -- ==========================================
 -- 2. TABEL USERS
@@ -37,6 +38,7 @@ CREATE TABLE users (
     REFERENCES upts(id)
     ON DELETE SET NULL
 );
+GO
 
 -- ==========================================
 -- 3. MASTER DATA SAMPAH
@@ -58,6 +60,7 @@ CREATE TABLE sampah_b3 (
     created_at DATETIME DEFAULT GETDATE()
 
 );
+GO
 
 -- ==========================================
 -- 4. TABEL VENDOR
@@ -78,6 +81,7 @@ CREATE TABLE vendors (
     created_at DATETIME DEFAULT GETDATE()
 
 );
+GO
 
 -- ==========================================
 -- 5. TRANSAKSI MASUK
@@ -102,6 +106,7 @@ CREATE TABLE transaksi_masuk (
     REFERENCES users(id)
 
 );
+GO
 
 -- ==========================================
 -- 6. DETAIL MASUK
@@ -127,6 +132,7 @@ CREATE TABLE detail_masuk (
     REFERENCES sampah_b3(id)
 
 );
+GO
 
 -- ==========================================
 -- 7. TRANSAKSI KELUAR
@@ -151,6 +157,7 @@ CREATE TABLE transaksi_keluar (
     REFERENCES vendors(id)
 
 );
+GO
 
 -- ==========================================
 -- 8. DETAIL KELUAR
@@ -176,6 +183,7 @@ CREATE TABLE detail_keluar (
     REFERENCES sampah_b3(id)
 
 );
+GO
 
 -- ==========================================
 -- DATA MASTER UPT
@@ -192,6 +200,7 @@ VALUES
 ('U007','UPT Otomasi'),
 ('U008','UPT Desain & Metrologi'),
 ('U009','Produksi');
+GO
 
 -- ==========================================
 -- DATA USER ADMIN
@@ -208,6 +217,7 @@ VALUES
 '$2y$12$ogUgX2p67rQefB.sLCXTYu0JafxOC9xW.irhxrwZkAGmvJl3FFbkG',
 'admin'
 );
+GO
 
 -- ==========================================
 -- DATA USER UPT
@@ -225,6 +235,7 @@ VALUES
 'upt',
 1
 );
+GO
 
 -- ==========================================
 -- MASTER DATA LIMBAH
@@ -254,6 +265,7 @@ VALUES
 ('NB3003','NB3','Kardus','Kg'),
 
 ('NB3004','NB3','Botol','Kg');
+GO
 
 -- ==========================================
 -- SELESAI
@@ -266,6 +278,8 @@ SELECT
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'transaksi_keluar';
 -- ==========================================
+USE limbah_b3;
+GO
 -- DATA DUMMY VENDORS (10 Data)
 -- ==========================================
 INSERT INTO vendors (kode_vendor, nama_vendor, alamat, kontak) VALUES
@@ -279,6 +293,7 @@ INSERT INTO vendors (kode_vendor, nama_vendor, alamat, kontak) VALUES
 ('V008', 'PT. Vendor Pengolah Limbah 8', 'Jl. Industri No. 8, Kawasan Pabrik', '081234567898'),
 ('V009', 'PT. Vendor Pengolah Limbah 9', 'Jl. Industri No. 9, Kawasan Pabrik', '081234567899'),
 ('V010', 'PT. Vendor Pengolah Limbah 10', 'Jl. Industri No. 10, Kawasan Pabrik', '0812345678910');
+GO
 
 -- ==========================================
 -- DATA DUMMY TRANSAKSI MASUK (100 Data)
@@ -384,6 +399,7 @@ INSERT INTO transaksi_masuk (no_transaksi, user_id, tanggal_masuk, keterangan) V
 ('TM0098', 2, '2026-12-22 15:37:00', 'Setoran rutin limbah mingguan 98'),
 ('TM0099', 2, '2026-02-01 11:27:00', 'Setoran rutin limbah mingguan 99'),
 ('TM0100', 2, '2026-10-18 09:15:00', 'Setoran rutin limbah mingguan 100');
+GO
 
 -- ==========================================
 -- DATA DUMMY DETAIL MASUK
@@ -587,6 +603,7 @@ INSERT INTO detail_masuk (transaksi_masuk_id, sampah_b3_id, quantity) VALUES
 (100, 6, 10.65),
 (100, 7, 14.38),
 (100, 6, 10.87);
+GO
 
 -- ==========================================
 -- DATA DUMMY TRANSAKSI KELUAR (100 Data)
@@ -692,6 +709,7 @@ INSERT INTO transaksi_keluar (no_transaksi, vendor_id, tanggal_keluar, keteranga
 ('TK0098', 6, '2026-06-12 08:06:00', 'Pengangkutan limbah oleh vendor'),
 ('TK0099', 8, '2026-10-13 08:15:00', 'Pengangkutan limbah oleh vendor'),
 ('TK0100', 1, '2026-08-13 10:06:00', 'Pengangkutan limbah oleh vendor');
+GO
 
 -- ==========================================
 -- DATA DUMMY DETAIL KELUAR
@@ -895,3 +913,4 @@ INSERT INTO detail_keluar (transaksi_keluar_id, sampah_b3_id, quantity) VALUES
 (100, 9, 128.78),
 (100, 7, 195.83),
 (100, 2, 140.62);
+GO
