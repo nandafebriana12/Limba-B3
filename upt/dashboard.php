@@ -101,58 +101,84 @@ foreach($monthly_data as $data) {
 }
 ?>
 
-<div class="card" style="margin-top: 20px;">
-    <div class="card-header">
-        <h3 class="card-title">Grafik Transaksi Masuk (Saya) & Keluar (Ke Vendor) per Bulan</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 20px;">
+    <!-- Grafik Masuk (UPT Saya) -->
+    <div class="card" style="margin-top: 0;">
+        <div class="card-header">
+            <h3 class="card-title">Trend Limbah Masuk (UPT Saya)</h3>
+        </div>
+        <div style="width: 100%; height: 300px;">
+            <canvas id="chartMasuk"></canvas>
+        </div>
     </div>
-    <div style="width: 100%; max-height: 400px; display: flex; justify-content: center;">
-        <canvas id="transaksiChart"></canvas>
+
+    <!-- Grafik Keluar (Global Vendor) -->
+    <div class="card" style="margin-top: 0;">
+        <div class="card-header">
+            <h3 class="card-title">Trend Limbah Keluar (Total ke Vendor)</h3>
+        </div>
+        <div style="width: 100%; height: 300px;">
+            <canvas id="chartKeluar"></canvas>
+        </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const ctx = document.getElementById('transaksiChart').getContext('2d');
-    new Chart(ctx, {
+    const stockOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+            line: { tension: 0 } // Garis lurus ala saham
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    };
+
+    // Chart Masuk
+    new Chart(document.getElementById('chartMasuk').getContext('2d'), {
         type: 'line',
         data: {
             labels: <?= json_encode($chart_labels) ?>,
-            datasets: [
-                {
-                    label: 'Limbah Masuk (UPT Saya)',
-                    data: <?= json_encode($data_masuk) ?>,
-                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                    borderColor: 'rgba(16, 185, 129, 1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: 'rgba(16, 185, 129, 1)'
-                },
-                {
-                    label: 'Limbah Keluar (Total ke Vendor)',
-                    data: <?= json_encode($data_keluar) ?>,
-                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                    borderColor: 'rgba(239, 68, 68, 1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: 'rgba(239, 68, 68, 1)'
-                }
-            ]
+            datasets: [{
+                label: 'Limbah Masuk',
+                data: <?= json_encode($data_masuk) ?>,
+                borderColor: 'rgba(16, 185, 129, 1)', // Hijau
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+            }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        }
+        options: stockOptions
+    });
+
+    // Chart Keluar
+    new Chart(document.getElementById('chartKeluar').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($chart_labels) ?>,
+            datasets: [{
+                label: 'Limbah Keluar',
+                data: <?= json_encode($data_keluar) ?>,
+                borderColor: 'rgba(239, 68, 68, 1)', // Merah
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: 'rgba(239, 68, 68, 1)'
+            }]
+        },
+        options: stockOptions
     });
 });
 </script>
