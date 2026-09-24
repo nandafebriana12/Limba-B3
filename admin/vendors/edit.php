@@ -68,17 +68,17 @@ require_once __DIR__ . '/../../includes/header.php';
 
         <div class="form-group">
             <label for="nama_vendor">Nama Vendor</label>
-            <input type="text" id="nama_vendor" name="nama_vendor" class="form-control" value="<?= htmlspecialchars($vendor['nama_vendor']) ?>" required>
+            <input type="text" id="nama_vendor" name="nama_vendor" class="form-control" value="<?= htmlspecialchars($vendor['nama_vendor']) ?>" required maxlength="255">
         </div>
         
         <div class="form-group">
             <label for="kontak">Kontak (No. HP / Email)</label>
-            <input type="text" id="kontak" name="kontak" class="form-control" value="<?= htmlspecialchars($vendor['kontak']) ?>">
+            <input type="text" id="kontak" name="kontak" class="form-control" value="<?= htmlspecialchars($vendor['kontak']) ?required maxlength="100">">
         </div>
 
         <div class="form-group">
             <label for="alamat">Alamat</label>
-            <textarea id="alamat" name="alamat" class="form-control" rows="3"><?= htmlspecialchars($vendor['alamat']) ?></textarea>
+            <textarea id="alamat" name="alamat" class="form-control" rows="3"required maxlength="500"><?= htmlspecialchars($vendor['alamat']) ?></textarea>
         </div>
         
         <button type="submit" class="btn btn-primary" style="width: auto;">Simpan Perubahan</button>
@@ -86,3 +86,4 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+

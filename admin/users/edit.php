@@ -83,7 +83,7 @@ require_once __DIR__ . '/../../includes/header.php';
         
         <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-control" value="<?= htmlspecialchars($user['username']) ?>" required autocomplete="off">
+            <input type="text" id="username" name="username" class="form-control" value="<?= htmlspecialchars($user['username']) ?>" required maxlength="50" autocomplete="off">
         </div>
         
         <div class="form-group">
@@ -131,3 +131,4 @@ toggleUPT(document.getElementById('role').value);
 </script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+

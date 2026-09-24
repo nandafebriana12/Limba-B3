@@ -160,7 +160,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 name="nama_sampah"
                 id="nama_sampah"
                 class="form-control"
-                required
+                required maxlength="255"
             >
 
                 <option value="">

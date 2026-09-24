@@ -38,37 +38,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (empty($sampah_ids) || count($sampah_ids) == 0) {
             $error = "Pilih minimal satu limbah B3.";
         } else {
-            try {
-                $conn->beginTransaction();
-                
-                // Generate No Transaksi (TM001)
-                $no_transaksi = generateKode($conn, 'transaksi_masuk', 'no_transaksi', 'TM');
-                
-                // Insert Header
-                $stmt = $conn->prepare("INSERT INTO transaksi_masuk (no_transaksi, user_id, tanggal_masuk, keterangan) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$no_transaksi, $_SESSION['user_id'], $tanggal_masuk, $keterangan]);
-                
-                $transaksi_id = $conn->lastInsertId();
-                
-                // Insert Details
-                $stmtDetail = $conn->prepare("INSERT INTO detail_masuk (transaksi_masuk_id, sampah_b3_id, quantity) VALUES (?, ?, ?)");
-                
-                for ($i = 0; $i < count($sampah_ids); $i++) {
-                    $s_id = $sampah_ids[$i];
-                    $qty = $quantities[$i];
-                    if ($qty > 0) {
-                        $stmtDetail->execute([$transaksi_id, $s_id, $qty]);
-                    }
+            // Validasi tambahan: Pastikan semua item memiliki quantity > 0
+            $valid_details = 0;
+            for ($i = 0; $i < count($sampah_ids); $i++) {
+                $qty = floatval($quantities[$i] ?? 0);
+                if ($qty > 0) {
+                    $valid_details++;
                 }
-                
-                $conn->commit();
-                
-                $_SESSION['success'] = "Transaksi masuk berhasil disimpan dengan No: $no_transaksi.";
-                header("Location: index.php");
-                exit;
-            } catch(PDOException $e) {
-                $conn->rollBack();
-                $error = "Terjadi kesalahan: " . $e->getMessage();
+            }
+            
+            if ($valid_details == 0) {
+                $error = "Kuantitas limbah harus lebih dari 0.";
+            }
+            
+            if (empty($error)) {
+                try {
+                    $conn->beginTransaction();
+                    
+                    // Generate No Transaksi (TM001)
+                    $no_transaksi = generateKode($conn, 'transaksi_masuk', 'no_transaksi', 'TM');
+                    
+                    // Insert Header
+                    $stmt = $conn->prepare("INSERT INTO transaksi_masuk (no_transaksi, user_id, tanggal_masuk, keterangan) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$no_transaksi, $_SESSION['user_id'], $tanggal_masuk, $keterangan]);
+                    
+                    $transaksi_id = $conn->lastInsertId();
+                    
+                    // Insert Details
+                    $stmtDetail = $conn->prepare("INSERT INTO detail_masuk (transaksi_masuk_id, sampah_b3_id, quantity) VALUES (?, ?, ?)");
+                    
+                    for ($i = 0; $i < count($sampah_ids); $i++) {
+                        $s_id = intval($sampah_ids[$i]);
+                        $qty = floatval($quantities[$i] ?? 0);
+                        if ($qty > 0 && $s_id > 0) {
+                            $stmtDetail->execute([$transaksi_id, $s_id, $qty]);
+                        }
+                    }
+                    
+                    $conn->commit();
+                    
+                    $_SESSION['success'] = "Transaksi masuk berhasil disimpan dengan No: $no_transaksi.";
+                    header("Location: index.php");
+                    exit;
+                } catch(PDOException $e) {
+                    $conn->rollBack();
+                    $error = "Terjadi kesalahan database saat menyimpan transaksi.";
+                }
             }
         }
     }

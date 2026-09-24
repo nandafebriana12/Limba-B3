@@ -348,8 +348,9 @@ $l['kode_sampah']." - ".$l['nama_sampah']
 
 <input
 type="number"
-name="quantity[]"
-class="form-control"
+                                name="quantity[]"
+                                class="form-control"
+                                min="0.01" step="0.01" required
 min="0.01"
 step="0.01"
 required
@@ -487,8 +488,9 @@ $l['kode_sampah']." - ".$l['nama_sampah']
 
 <input
 type="number"
-name="quantity[]"
-class="form-control"
+                                name="quantity[]"
+                                class="form-control"
+                                min="0.01" step="0.01" required
 min="0.01"
 step="0.01"
 required
@@ -544,3 +546,5 @@ function hapusBaris(btn){
 </script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+
+

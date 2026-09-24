@@ -67,7 +67,7 @@ require_once __DIR__ . '/../../includes/header.php';
 
         <div class="form-group">
             <label for="nama_upt">Nama UPT (Fakultas / Prodi)</label>
-            <input type="text" id="nama_upt" name="nama_upt" class="form-control" value="<?= htmlspecialchars($upt['nama_upt']) ?>" required>
+            <input type="text" id="nama_upt" name="nama_upt" class="form-control" value="<?= htmlspecialchars($upt['nama_upt']) ?>" required maxlength="255">
         </div>
         
         <button type="submit" class="btn btn-primary" style="width: auto;">Simpan Perubahan</button>
@@ -75,3 +75,4 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+
